@@ -23,7 +23,6 @@ function create() {
             #preview #center .miniArtboard {position: absolute; background: #fff; border: 1px solid #777; z-index: 2;}
             #preview #center #miniViewport {position: absolute; border: 2px solid #0F66D0; z-index: 3;}
             #preview #center #horizontalPointer, #preview #center #verticalPointer {position: absolute; background: #DDD; z-index: 1;}
-            #rootWidthSlider {width: 100%;}
             #footer {width: 100%; position: fixed; bottom: 0; left: 0; line-height: 150%;}
             #footer .trigger {font-weight: bold; text-decoration: underline; color: #0F66D0;}
         </style>
@@ -31,8 +30,6 @@ function create() {
             <div id="preview" title="Click to jump into specific region">
                 <div id="center"></div>
             </div>
-            <br/>
-            <!--<input type="range" min="30000" max=`+rootWidth+` step=1000 value=`+rootWidth+` name="rootWidthSlider" id="rootWidthSlider" />-->
             <div id="footer">
                 Crosshair is <span class="trigger">on</span>, viewport is <span class="trigger">blue</span> and ghost mode is <span class="trigger">off</span>.
             </div>
@@ -104,14 +101,11 @@ function show(event) {
 
     updateTimer = setInterval(
         function() {
-            // let rootWidthSlider = document.getElementById("rootWidthSlider");
             if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
-                // console.log('minimap updated');
                 panelWidth = panel.offsetWidth;
                 viewportZoomFactor = viewport.zoomFactor;
                 viewportBoundsX = viewport.bounds.x;
                 viewportBoundsY = viewport.bounds.y;
-                // rootWidth = rootWidthSlider.value;
                 generateMinimap();
             }
         }, 20
