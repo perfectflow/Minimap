@@ -24,14 +24,14 @@ function create() {
             #preview #center #miniViewport {position: absolute; border: 2px solid #0F66D0; z-index: 3;}
             #preview #center #horizontalPointer, #preview #center #verticalPointer {position: absolute; background: #DDD; z-index: 1;}
             #footer {width: 100%; position: fixed; bottom: 0; left: 0; line-height: 150%;}
-            #footer .trigger {font-weight: bold; text-decoration: underline; color: #0F66D0;}
+            #footer .trigger {font-weight: bold; text-decoration: underline; color: #0F66D0; cursor: pointer;}
         </style>
         <div id="main">
             <div id="preview" title="Click to jump into specific region">
                 <div id="center"></div>
             </div>
             <div id="footer">
-                Crosshair is <span class="trigger">on</span>, viewport is <span class="trigger">blue</span> and ghost mode is <span class="trigger">off</span>.
+                Crosshair is <span class="trigger">on</span>, theme is <span class="trigger">default</span> and ghost mode is <span class="trigger">off</span>.
             </div>
         </div>
         `;
@@ -99,17 +99,20 @@ function generateMinimap(){
 function show(event) {
     if (!panel) event.node.appendChild(create());
 
-    updateTimer = setInterval(
-        function() {
-            if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
-                panelWidth = panel.offsetWidth;
-                viewportZoomFactor = viewport.zoomFactor;
-                viewportBoundsX = viewport.bounds.x;
-                viewportBoundsY = viewport.bounds.y;
-                generateMinimap();
-            }
-        }, 20
-    );
+    setTimeout(() => {
+        updateTimer = setInterval(
+            function() {
+                if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
+                    console.log(panelWidth, viewportZoomFactor, viewportBoundsX, viewportBoundsY);
+                    panelWidth = panel.offsetWidth;
+                    viewportZoomFactor = viewport.zoomFactor;
+                    viewportBoundsX = viewport.bounds.x;
+                    viewportBoundsY = viewport.bounds.y;
+                    generateMinimap();
+                }
+            }, 20
+        );
+    }, 1000);
 
     let preview = document.getElementById("preview");
     preview.addEventListener("click", e => {
