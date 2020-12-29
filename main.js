@@ -24,16 +24,16 @@ function create() {
             #preview:before {content: ""; display: block; padding-top: 100%;}
             #preview #center {width: 0px; height: 0px; position: absolute; left: 50%; top: 50%;}
             #preview #center .miniArtboard {position: absolute; background: #fff; border: 1px solid #777; z-index: 2;}
-            #preview #center #miniViewport {position: absolute; border: 2px solid #0F66D0; z-index: 3;}
+            #preview #center #miniViewport {position: absolute; border: 2px solid blue; z-index: 3;}
             #preview #center #horizontalPointer, #preview #center #verticalPointer {position: absolute; background: #DDD; z-index: 1;}
             #footer {width: 100%; position: fixed; bottom: 0; left: 0; line-height: 150%;}
             #settings {width: 100%; display: block;}
             #settings li {width: 100%; display: flex; flex-direction: row; justify-content: space-between;}
             #settings li h3 {margin: 0;}
-            .dark_mode #preview {background: #001534;}
-            .dark_mode #miniViewport {border: 2px solid #FEBA2C!important;}
+            .dark_mode #preview {background: #3C3D3D;}
+            .dark_mode #miniViewport {border: 2px solid #FD7422!important;}
             .dark_mode .miniArtboard {border: none!important;}
-            .dark_mode #horizontalPointer, .dark_mode #verticalPointer {background: #000!important; opacity: 0.5;}
+            .dark_mode #horizontalPointer, .dark_mode #verticalPointer {background: #303031!important;}
         </style>
         <div id="main">
             <div id="preview" title="Click to jump into specific region">
