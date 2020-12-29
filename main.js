@@ -14,6 +14,9 @@ let viewportBoundsY = viewport.bounds.y;
 let updateTimer;
 
 function create() {
+    let crosshair_setting = window.localStorage.getItem("crosshair") == "true" ? "checked" : "";
+    let dark_mode_setting = window.localStorage.getItem("dark_mode") == "true" ? "checked" : "";
+    let ghost_mode_setting = window.localStorage.getItem("ghost_mode") == "true" ? "checked" : "";
     const HTML =
         `<style>
             #main {height: 100%; position: relative;}
@@ -24,20 +27,39 @@ function create() {
             #preview #center #miniViewport {position: absolute; border: 2px solid #0F66D0; z-index: 3;}
             #preview #center #horizontalPointer, #preview #center #verticalPointer {position: absolute; background: #DDD; z-index: 1;}
             #footer {width: 100%; position: fixed; bottom: 0; left: 0; line-height: 150%;}
-            #footer .trigger {font-weight: bold; text-decoration: underline; color: #0F66D0; cursor: pointer;}
+            #settings {width: 100%; display: block;}
+            #settings li {width: 100%; display: flex; flex-direction: row; justify-content: space-between;}
+            #settings li h3 {margin: 0;}
+            .dark_mode #preview {background: #001534;}
+            .dark_mode #miniViewport {border: 2px solid #FEBA2C!important;}
+            .dark_mode .miniArtboard {border: none!important;}
+            .dark_mode #horizontalPointer, .dark_mode #verticalPointer {background: #000!important; opacity: 0.5;}
         </style>
         <div id="main">
             <div id="preview" title="Click to jump into specific region">
                 <div id="center"></div>
             </div>
             <div id="footer">
-                Crosshair is <span class="trigger">on</span>, theme is <span class="trigger">default</span> and ghost mode is <span class="trigger">off</span>.
+                <ul id="settings">
+                    <li><h3>Crosshair</h3><input type="checkbox" id="updateSetting" name="crosshair" `+crosshair_setting+` /></li>
+                    <li><h3>Dark mode</h3><input type="checkbox" id="updateSetting" name="dark_mode" `+dark_mode_setting+` /></li>
+                    <li><h3>Ghost mode</h3><input type="checkbox" id="updateSetting" name="ghost_mode" `+ghost_mode_setting+` /></li>
+                    <li><h3><a href="https://minimap.xdplugins.co">Learn more</a></h3></li>
+                </ul>
             </div>
         </div>
         `;
 
     panel = document.createElement("div");
     panel.innerHTML = HTML;
+
+    panel.querySelectorAll("#updateSetting").forEach(item => {
+        item.addEventListener('click', function() {
+            window.localStorage.setItem(this.name, this.checked ? true : false);
+            generateMinimap();
+        })
+    })
+
     return panel;
 }
 
@@ -50,6 +72,12 @@ function generateMinimap(){
         center.removeChild(center.firstChild);
     }
 
+    if(window.localStorage.getItem("dark_mode") == "true"){
+        document.getElementById("main").setAttribute("class", "dark_mode");
+    }else{
+        document.getElementById("main").removeAttribute("class");
+    }
+
     let miniViewport = document.createElement("div");
     miniViewport.setAttribute("id", "miniViewport");
     miniViewport.style.width = viewport.bounds.width / scaleFactor;
@@ -57,29 +85,29 @@ function generateMinimap(){
     miniViewport.style.left = viewport.bounds.x / scaleFactor;
     miniViewport.style.top = viewport.bounds.y / scaleFactor;
     // miniViewport.setAttribute("draggable", true);
-
-    let horizontalPointer = document.createElement("div");
-    horizontalPointer.setAttribute("id", "horizontalPointer");
-    horizontalPointer.style.width = rootWidth / scaleFactor;
-    horizontalPointer.style.height = viewport.bounds.height / scaleFactor;
-    horizontalPointer.style.left = (rootWidth / scaleFactor) / 2 * -1;
-    horizontalPointer.style.top = viewport.bounds.y / scaleFactor;
-
-    let verticalPointer = document.createElement("div");
-    verticalPointer.setAttribute("id", "verticalPointer");
-    verticalPointer.style.height = rootWidth / scaleFactor;
-    verticalPointer.style.width = viewport.bounds.width / scaleFactor;
-    verticalPointer.style.top = (rootWidth / scaleFactor) / 2 * -1;
-    verticalPointer.style.left = viewport.bounds.x / scaleFactor;
-
     // miniViewport.addEventListener("dragend", event => {
     //     console.log(event.clientX - panel.offsetWidth / 2);
     //     miniViewport.style.left = event.clientX - panel.offsetWidth / 2;
     // });
-
     center.appendChild(miniViewport);
-    center.appendChild(horizontalPointer);
-    center.appendChild(verticalPointer);
+
+    if(window.localStorage.getItem("crosshair") == "true"){
+        let horizontalPointer = document.createElement("div");
+        horizontalPointer.setAttribute("id", "horizontalPointer");
+        horizontalPointer.style.width = rootWidth / scaleFactor;
+        horizontalPointer.style.height = viewport.bounds.height / scaleFactor;
+        horizontalPointer.style.left = (rootWidth / scaleFactor) / 2 * -1;
+        horizontalPointer.style.top = viewport.bounds.y / scaleFactor;
+        center.appendChild(horizontalPointer);
+
+        let verticalPointer = document.createElement("div");
+        verticalPointer.setAttribute("id", "verticalPointer");
+        verticalPointer.style.height = rootWidth / scaleFactor;
+        verticalPointer.style.width = viewport.bounds.width / scaleFactor;
+        verticalPointer.style.top = (rootWidth / scaleFactor) / 2 * -1;
+        verticalPointer.style.left = viewport.bounds.x / scaleFactor;
+        center.appendChild(verticalPointer);
+    }
 
     for (let i = 0; i < scenegraph.root.children.length; i++) {
         let item = scenegraph.root.children.at(i);
@@ -96,23 +124,35 @@ function generateMinimap(){
     }
 }
 
-function show(event) {
-    if (!panel) event.node.appendChild(create());
+async function initializeDefaultSettings(){
+    let default_settings = [];
+    default_settings["crosshair"] = true;
+    default_settings["dark_mode"] = false;
+    default_settings["ghost_mode"] = false;
+    for (var key in default_settings) {
+        if(!window.localStorage.getItem(key)){
+            window.localStorage.setItem(key, default_settings[key]);
+        }
+    }
+}
 
-    setTimeout(() => {
-        updateTimer = setInterval(
-            function() {
-                if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
-                    console.log(panelWidth, viewportZoomFactor, viewportBoundsX, viewportBoundsY);
-                    panelWidth = panel.offsetWidth;
-                    viewportZoomFactor = viewport.zoomFactor;
-                    viewportBoundsX = viewport.bounds.x;
-                    viewportBoundsY = viewport.bounds.y;
-                    generateMinimap();
-                }
-            }, 20
-        );
-    }, 1000);
+async function show(event) {
+
+    await initializeDefaultSettings();
+
+    if (!panel) await event.node.appendChild(create());
+
+    updateTimer = setInterval(
+        function() {
+            if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
+                panelWidth = panel.offsetWidth;
+                viewportZoomFactor = viewport.zoomFactor;
+                viewportBoundsX = viewport.bounds.x;
+                viewportBoundsY = viewport.bounds.y;
+                generateMinimap();
+            }
+        }, 20
+    );
 
     let preview = document.getElementById("preview");
     preview.addEventListener("click", e => {
