@@ -19,13 +19,13 @@ function create() {
     let ghost_mode_setting = window.localStorage.getItem("ghost_mode") == "true" ? "checked" : "";
     const HTML =
         `<style>
-            #main {height: 100%; position: relative;}
-            #preview {width: 100%; height: auto; position: relative; overflow: hidden; background: #E4E4E4;}
+            #main {width: 100%; height: 100%; position: relative;}
+            #preview {width: 100%; height: auto; position: relative; overflow: hidden; background: rgba(204, 204, 204, 0.5);}
             #preview:before {content: ""; display: block; padding-top: 100%;}
             #preview #center {width: 0px; height: 0px; position: absolute; left: 50%; top: 50%;}
             #preview #center .miniArtboard {position: absolute; background: #fff; border: 1px solid #777; z-index: 2;}
             #preview #center #miniViewport {position: absolute; border: 2px solid blue; z-index: 3;}
-            #preview #center #horizontalPointer, #preview #center #verticalPointer {position: absolute; background: #DDD; z-index: 1;}
+            #preview #center #horizontalPointer, #preview #center #verticalPointer {position: absolute; background: #CCC; opacity: 0.5; z-index: 1;}
             #footer {width: 100%; position: fixed; bottom: 0; left: 0; line-height: 150%;}
             #settings {width: 100%; display: block;}
             #settings li {width: 100%; display: flex; flex-direction: row; justify-content: space-between;}
@@ -34,6 +34,9 @@ function create() {
             .dark_mode #miniViewport {border: 2px solid #FD7422!important;}
             .dark_mode .miniArtboard {border: none!important;}
             .dark_mode #horizontalPointer, .dark_mode #verticalPointer {background: #303031!important;}
+            #ghost {width: 100%; height: 100%; position: fixed; left: 0; top: 0; overflow: hidden; z-index: -1;}
+            #ghost #ghostCenter {width: 0px; height: 0px; position: absolute; left: 50%; top: 50%;}
+            #ghost #ghostCenter .ghostArtboard {position: absolute; border: 1px solid #CDCDCD}
         </style>
         <div id="main">
             <div id="preview" title="Click to jump into specific region">
@@ -47,6 +50,9 @@ function create() {
                     <li><h3><a href="https://minimap.xdplugins.co">Learn more</a></h3></li>
                 </ul>
             </div>
+        </div>
+        <div id="ghost">
+            <div id="ghostCenter"></div>
         </div>
         `;
 
@@ -91,6 +97,20 @@ function generateMinimap(){
     // });
     center.appendChild(miniViewport);
 
+    for (let i = 0; i < scenegraph.root.children.length; i++) {
+        let item = scenegraph.root.children.at(i);
+        if (item instanceof Artboard) {
+            let miniArtboard = document.createElement("div");
+            miniArtboard.setAttribute("class" , "miniArtboard");
+            miniArtboard.setAttribute("id" , "miniArtboard-"+i);
+            miniArtboard.style.width = item.width / scaleFactor;
+            miniArtboard.style.height = item.height / scaleFactor;
+            miniArtboard.style.left = item.globalBounds.x / scaleFactor;
+            miniArtboard.style.top = item.globalBounds.y / scaleFactor;
+            center.appendChild(miniArtboard);
+        }
+    }
+
     if(window.localStorage.getItem("crosshair") == "true"){
         let horizontalPointer = document.createElement("div");
         horizontalPointer.setAttribute("id", "horizontalPointer");
@@ -109,19 +129,32 @@ function generateMinimap(){
         center.appendChild(verticalPointer);
     }
 
-    for (let i = 0; i < scenegraph.root.children.length; i++) {
-        let item = scenegraph.root.children.at(i);
-        if (item instanceof Artboard) {
-            let miniArtboard = document.createElement("div");
-            miniArtboard.setAttribute("class" , "miniArtboard");
-            miniArtboard.setAttribute("id" , "miniArtboard-"+i);
-            miniArtboard.style.width = item.width / scaleFactor;
-            miniArtboard.style.height = item.height / scaleFactor;
-            miniArtboard.style.left = item.globalBounds.x / scaleFactor;
-            miniArtboard.style.top = item.globalBounds.y / scaleFactor;
-            center.appendChild(miniArtboard);
+    if(window.localStorage.getItem("ghost_mode") == "true"){
+        let ghostCenter = document.getElementById("ghostCenter");
+        while (ghostCenter.firstChild) {
+            ghostCenter.removeChild(ghostCenter.firstChild);
+        }
+        for (let i = 0; i < scenegraph.root.children.length; i++) {
+            let item = scenegraph.root.children.at(i);
+            if (item instanceof Artboard) {
+                let ghostArtboard = document.createElement("div");
+                ghostArtboard.setAttribute("class" , "ghostArtboard");
+                ghostArtboard.style.width = item.width * viewport.zoomFactor;
+                ghostArtboard.style.height = item.height * viewport.zoomFactor;
+                ghostArtboard.style.left = item.globalBounds.x * viewport.zoomFactor;
+                ghostArtboard.style.top = item.globalBounds.y * viewport.zoomFactor;
+                ghostCenter.appendChild(ghostArtboard);
+                ghostCenter.style.left = panel.offsetWidth - (viewport.bounds.x * viewport.zoomFactor);
+                ghostCenter.style.top = panel.offsetHeight - (viewport.bounds.y * viewport.zoomFactor) - panel.offsetHeight - 100;
+            }
+        }
+    }else{
+        let ghostCenter = document.getElementById("ghostCenter");
+        while (ghostCenter.firstChild) {
+            ghostCenter.removeChild(ghostCenter.firstChild);
         }
     }
+
 }
 
 async function initializeDefaultSettings(){
