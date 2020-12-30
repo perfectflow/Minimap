@@ -11,7 +11,6 @@ let scaleFactor = 0;
 let viewportZoomFactor = viewport.zoomFactor;
 let viewportBoundsX = viewport.bounds.x;
 let viewportBoundsY = viewport.bounds.y;
-let updateTimer;
 
 function create() {
     let crosshair_setting = window.localStorage.getItem("crosshair") == "true" ? "checked" : "";
@@ -36,7 +35,7 @@ function create() {
             .dark_mode #horizontalPointer, .dark_mode #verticalPointer {background: #303031!important;}
             #ghost {width: 100%; height: 100%; position: fixed; left: 0; top: 0; overflow: hidden; z-index: -1;}
             #ghost #ghostCenter {width: 0px; height: 0px; position: absolute; left: 50%; top: 50%;}
-            #ghost #ghostCenter .ghostArtboard {position: absolute; border: 1px solid #CDCDCD}
+            #ghost #ghostCenter .ghostArtboard {position: absolute; border: 1px solid #CDCDCD; background: #fff;}
         </style>
         <div id="main">
             <div id="preview" title="Click to jump into specific region">
@@ -175,7 +174,7 @@ async function show(event) {
 
     if (!panel) await event.node.appendChild(create());
 
-    updateTimer = setInterval(
+    setInterval(
         function() {
             if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
                 panelWidth = panel.offsetWidth;
