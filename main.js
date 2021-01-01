@@ -76,10 +76,6 @@ function create() {
 async function generateMinimap(){
     let preview = document.getElementById("preview");
     let center = document.getElementById("center");
-
-    // rootWidth = await calculateRootSize();
-    // console.log(rootWidth);
-
     scaleFactor = rootWidth / preview.offsetWidth;
 
     while (center.firstChild) {
@@ -166,32 +162,6 @@ async function generateMinimap(){
 
 }
 
-async function calculateRootSize(){
-    let minX = scenegraph.root.children.at(0).globalBounds.x;
-    let maxX = scenegraph.root.children.at(0).globalBounds.x;
-    let minY = scenegraph.root.children.at(0).globalBounds.y;
-    let maxY = scenegraph.root.children.at(0).globalBounds.y;
-
-    for (let i = 0; i < scenegraph.root.children.length; i++) {
-        if(scenegraph.root.children.at(i).globalBounds.x > maxX){
-            maxX = scenegraph.root.children.at(i).globalBounds.x + scenegraph.root.children.at(i).globalBounds.width;
-        }
-        if(scenegraph.root.children.at(i).globalBounds.x < minX){
-            minX = scenegraph.root.children.at(i).globalBounds.x;
-        }
-        if(scenegraph.root.children.at(i).globalBounds.y > maxY){
-            maxY = scenegraph.root.children.at(i).globalBounds.y + scenegraph.root.children.at(i).globalBounds.height;
-        }
-        if(scenegraph.root.children.at(i).globalBounds.y < minY){
-            minY = scenegraph.root.children.at(i).globalBounds.y;
-        }
-    }
-    
-    let rootWidth = maxX - minX;
-    let rootHeight = maxY - minY;
-    return rootWidth > rootHeight ? rootWidth : rootHeight;
-}
-
 async function initializeDefaultSettings(){
     let default_settings = [];
     default_settings["crosshair"] = true;
@@ -240,9 +210,7 @@ function hide(event) {
 }
 
 async function update() {
-    if(firstTime == false){
-        await generateMinimap();
-    }
+    if (!firstTime) await generateMinimap();
     firstTime = false;
 }
 
