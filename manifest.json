@@ -1,5 +1,5 @@
 {
-  "id": "Minimap",
+  "id": "cf0de2af",
   "name": "Minimap",
   "version": "1.0.0",
   "icons": [
@@ -15,7 +15,7 @@
       "type": "panel",
       "label": "Minimap",
       "panelId": "Minimap",
-      "shortcut": { "mac": "Cmd+Shift+M", "win": "Ctrl+Shift+M" }
+      "shortcut": { "mac": "CMD+Alt+SHIFT+M", "win": "Ctrl+Alt+SHIFT+M" }
     }
   ]
 }
