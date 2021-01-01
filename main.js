@@ -12,6 +12,8 @@ let scaleFactor = 0;
 let viewportZoomFactor = viewport.zoomFactor;
 let viewportBoundsX = viewport.bounds.x;
 let viewportBoundsY = viewport.bounds.y;
+let updateInterval;
+let firstTime = true;
 
 function create() {
     let crosshair_setting = window.localStorage.getItem("crosshair") == "true" ? "checked" : "";
@@ -62,18 +64,22 @@ function create() {
     panel.innerHTML = HTML;
 
     panel.querySelectorAll("#updateSetting").forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', async function () {
             window.localStorage.setItem(this.name, this.checked ? true : false);
-            generateMinimap();
+            await generateMinimap();
         })
     })
 
     return panel;
 }
 
-function generateMinimap(){
+async function generateMinimap(){
     let preview = document.getElementById("preview");
     let center = document.getElementById("center");
+
+    // rootWidth = await calculateRootSize();
+    // console.log(rootWidth);
+
     scaleFactor = rootWidth / preview.offsetWidth;
 
     while (center.firstChild) {
@@ -160,6 +166,32 @@ function generateMinimap(){
 
 }
 
+async function calculateRootSize(){
+    let minX = scenegraph.root.children.at(0).globalBounds.x;
+    let maxX = scenegraph.root.children.at(0).globalBounds.x;
+    let minY = scenegraph.root.children.at(0).globalBounds.y;
+    let maxY = scenegraph.root.children.at(0).globalBounds.y;
+
+    for (let i = 0; i < scenegraph.root.children.length; i++) {
+        if(scenegraph.root.children.at(i).globalBounds.x > maxX){
+            maxX = scenegraph.root.children.at(i).globalBounds.x + scenegraph.root.children.at(i).globalBounds.width;
+        }
+        if(scenegraph.root.children.at(i).globalBounds.x < minX){
+            minX = scenegraph.root.children.at(i).globalBounds.x;
+        }
+        if(scenegraph.root.children.at(i).globalBounds.y > maxY){
+            maxY = scenegraph.root.children.at(i).globalBounds.y + scenegraph.root.children.at(i).globalBounds.height;
+        }
+        if(scenegraph.root.children.at(i).globalBounds.y < minY){
+            minY = scenegraph.root.children.at(i).globalBounds.y;
+        }
+    }
+    
+    let rootWidth = maxX - minX;
+    let rootHeight = maxY - minY;
+    return rootWidth > rootHeight ? rootWidth : rootHeight;
+}
+
 async function initializeDefaultSettings(){
     let default_settings = [];
     default_settings["crosshair"] = true;
@@ -174,25 +206,13 @@ async function initializeDefaultSettings(){
 
 async function show(event) {
 
-    await initializeDefaultSettings();
-
     if (!panel) await event.node.appendChild(create());
 
-    setInterval(
-        function() {
-            if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewportBoundsX != viewport.bounds.x || viewportBoundsY != viewport.bounds.y){
-                panelWidth = panel.offsetWidth;
-                viewportZoomFactor = viewport.zoomFactor;
-                viewportBoundsX = viewport.bounds.x;
-                viewportBoundsY = viewport.bounds.y;
-                generateMinimap();
-            }
-        }, 20
-    );
+    await initializeDefaultSettings();
 
     let preview = document.getElementById("preview");
     preview.addEventListener("click", e => {
-        editDocument({ editLabel: "Scroll into view" }, function () {
+        editDocument({ editLabel: "Scroll into viewport" }, function () {
             var rect = preview.getBoundingClientRect();
             let miniViewport = document.getElementById("miniViewport");
             var x = ((e.clientX - rect.left - miniViewport.offsetWidth / 2) - (preview.offsetWidth / 2)) * scaleFactor;
@@ -201,6 +221,18 @@ async function show(event) {
         });
     });
 
+    updateInterval = setInterval(
+        async function() {
+            if (panel.offsetWidth != panelWidth || viewport.zoomFactor != viewportZoomFactor || viewport.bounds.x != viewportBoundsX || viewport.bounds.y != viewportBoundsY){
+                panelWidth = panel.offsetWidth;
+                viewportZoomFactor = viewport.zoomFactor;
+                viewportBoundsX = viewport.bounds.x;
+                viewportBoundsY = viewport.bounds.y;
+                await generateMinimap();
+            }
+        }, 20
+    );
+
 }
 
 function hide(event) {
@@ -208,7 +240,10 @@ function hide(event) {
 }
 
 async function update() {
-    generateMinimap();
+    if(firstTime == false){
+        await generateMinimap();
+    }
+    firstTime = false;
 }
 
 module.exports = {
