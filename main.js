@@ -40,14 +40,14 @@ function create() {
             #ghost #ghostCenter .ghostArtboard img {width: 100%;}
         </style>
         <div id="main">
-            <div id="preview" title="Click to jump into specific region">
+            <div id="preview" title="Click to jump into specific viewport">
                 <div id="center"></div>
             </div>
             <div id="footer">
                 <ul id="settings">
-                    <li><h3>Crosshair</h3><input type="checkbox" id="updateSetting" name="crosshair" `+crosshair_setting+` /></li>
-                    <li><h3>Dark mode</h3><input type="checkbox" id="updateSetting" name="dark_mode" `+dark_mode_setting+` /></li>
-                    <li><h3>Ghost mode</h3><input type="checkbox" id="updateSetting" name="ghost_mode" `+ghost_mode_setting+` /></li>
+                    <li title="Axis lines for viewport's position"><h3>Crosshair</h3><input type="checkbox" id="updateSetting" name="crosshair" `+crosshair_setting+` /></li>
+                    <li title="Alternative style of the minimap"><h3>Dark mode</h3><input type="checkbox" id="updateSetting" name="dark_mode" `+dark_mode_setting+` /></li>
+                    <li title="Artboards will be visible underneath plugin's panel"><h3>Ghost mode</h3><input type="checkbox" id="updateSetting" name="ghost_mode" `+ghost_mode_setting+` /></li>
                     <li>&nbsp;</li>
                     <li><h3><a href="https://minimap.xdplugins.co">Learn more</a></h3></li>
                 </ul>
