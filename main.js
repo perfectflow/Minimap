@@ -34,7 +34,7 @@ function create() {
             .dark_mode #miniViewport {border: 2px solid #FD7422!important;}
             .dark_mode .miniArtboard {border: none!important;}
             .dark_mode #horizontalPointer, .dark_mode #verticalPointer {background: #303031!important;}
-            #ghost {position: fixed; left: -12px; right: -12px; top: -12px; bottom: -12px; overflow: hidden; z-index: -1;}
+            #ghost {position: fixed; left: -12px; right: -12px; top: -12px; bottom: 0; overflow: hidden; z-index: -1;}
             #ghost #ghostCenter {width: 0px; height: 0px; position: absolute; left: 50%; top: 50%;}
             #ghost #ghostCenter .ghostArtboard {position: absolute; border: 1px solid #CDCDCD; background: #fff; overflow: hidden;}
             #ghost #ghostCenter .ghostArtboard img {width: 100%;}
@@ -48,6 +48,7 @@ function create() {
                     <li><h3>Crosshair</h3><input type="checkbox" id="updateSetting" name="crosshair" `+crosshair_setting+` /></li>
                     <li><h3>Dark mode</h3><input type="checkbox" id="updateSetting" name="dark_mode" `+dark_mode_setting+` /></li>
                     <li><h3>Ghost mode</h3><input type="checkbox" id="updateSetting" name="ghost_mode" `+ghost_mode_setting+` /></li>
+                    <li>&nbsp;</li>
                     <li><h3><a href="https://minimap.xdplugins.co">Learn more</a></h3></li>
                 </ul>
             </div>
