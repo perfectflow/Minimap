@@ -63,12 +63,14 @@ function create() {
     panel = document.createElement("div");
     panel.innerHTML = HTML;
 
-    panel.querySelectorAll("#updateSetting").forEach(item => {
-        item.addEventListener('click', async function () {
-            window.localStorage.setItem(this.name, this.checked ? true : false);
-            await generateMinimap();
+    setTimeout(function(){
+        panel.querySelectorAll("#updateSetting").forEach(item => {
+            item.addEventListener('click', async function () {
+                window.localStorage.setItem(this.name, this.checked ? true : false);
+                await generateMinimap();
+            })
         })
-    })
+    }, 100);
 
     return panel;
 }
